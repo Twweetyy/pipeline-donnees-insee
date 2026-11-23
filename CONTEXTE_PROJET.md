@@ -8,8 +8,8 @@
 
 ## 1. Présentation du Projet
 
-**Nom** : BDDMAS Roubaix et MEL – ApplicationMAJ  
-**Dépôt Git** : GitHub (branche `main`)  
+**Nom** : BDDMAS Roubaix et MEL – pipeline-donnees-insee  
+**Dépôt Git** : [github.com/Twweetyy/pipeline-donnees-insee](https://github.com/Twweetyy/pipeline-donnees-insee) (branche `main`)  
 **Langage** : Python 3.11 ou plus (3.14 sur le poste, 3.12 dans l'image Docker) + HTML/CSS/JS (vanilla)  
 **Serveur** : FastAPI + Uvicorn  
 **Usage** : Génération du classeur Excel BDDMAS : 38 IRIS de Roubaix, ou 95 communes de la MEL (onglet MEL du portail)
@@ -17,7 +17,7 @@
 ### Architecture simplifiée
 
 ```
-ApplicationMAJ/
+pipeline-donnees-insee/
 ├─ main_bddmas.py              → Orchestrateur du pipeline ETL
 ├─ webapp.py                   → API FastAPI (jobs du classeur BDDMAS + page BPE)
 ├─ run_portal.bat / .py        → Lanceur du portail (double-clic, lance d'abord le transformer du recensement)
@@ -172,6 +172,12 @@ ApplicationMAJ/
 ---
 
 ## 6. Historique des Sessions de Travail
+
+### 📅 23 novembre 2026 — Dépôt renommé en pipeline-donnees-insee
+
+- Le dépôt GitHub `ApplicationMAJ` devient `pipeline-donnees-insee` : [github.com/Twweetyy/pipeline-donnees-insee](https://github.com/Twweetyy/pipeline-donnees-insee)
+- Nom du projet et arborescences mis à jour dans `README.md`, ce fichier et `doc/etat_du_projet_bddmas.md`
+- Les anciennes URL redirigent automatiquement chez GitHub ; mettre à jour le remote local : `git remote set-url origin https://github.com/Twweetyy/pipeline-donnees-insee.git`
 
 ### 📅 17 novembre 2026 — Onglets Accueil et Sources
 
