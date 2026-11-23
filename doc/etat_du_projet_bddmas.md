@@ -6,7 +6,7 @@
 
 ## 1. Présentation & Objectifs du Projet
 
-Le projet **ApplicationMAJ (Portail BDDMAS)** fournit au Service SIG de la Ville de Roubaix une application web locale, simple d'utilisation et robuste pour :
+Le projet **pipeline-donnees-insee (Portail BDDMAS)** fournit au Service SIG de la Ville de Roubaix une application web locale, simple d'utilisation et robuste pour :
 * **Ingérer et contrôler** les fichiers de données infra-communales (recensement INSEE 2022 ou 2023, CAF, CNAM, DEFM, RPLS, fichier détail FD_INDCVI pour la petite enfance), en CSV ou en Parquet.
 * **Rapprocher automatiquement** les fichiers de données de leurs métadonnées (`meta_*.csv`, `varmod_*.csv`) et des référentiels territoriaux (`Périmètres_MAS.csv`, `grand_quartier.yml`, superficies IRIS).
 * **Exécuter le pipeline ETL** : transformation, jointures, calcul des indicateurs, règles d'arrondis (dont l'arrondi contrôlé des effectifs).

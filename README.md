@@ -1,4 +1,4 @@
-# BDDMAS Roubaix et MEL – ApplicationMAJ
+# BDDMAS Roubaix et MEL – pipeline-donnees-insee
 
 **Portail web et pipeline ETL qui transforment les fichiers bruts de l'Insee et de ses partenaires en un classeur Excel prêt à l'emploi : les 38 IRIS de Roubaix, ou les 95 communes de la Métropole Européenne de Lille.**
 
@@ -117,7 +117,7 @@ Détails dans `exemples/README.md`.
 ## Architecture
 
 ```text
-ApplicationMAJ/
+pipeline-donnees-insee/
 ├─ .venv/                          Environnement virtuel (non versionné)
 ├─ data/                           Fichiers bruts (sous-dossiers ignorés par Git) et référentiel Périmètres_MAS.csv
 │  ├─ data2023/                    CSV 2023 transformés
