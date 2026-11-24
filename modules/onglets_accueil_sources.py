@@ -155,15 +155,14 @@ def _ajouter_grands_quartiers(ws_sources, table) -> None:
     nb_quartiers = len({quartier for _, _, quartier in table})
     note = ws_sources.cell(
         row=ligne + 1, column=premiere,
-        value=f"{nb_quartiers} grands quartiers, {len(table)} IRIS. Mêmes noms que la colonne "
-              "« Grands quartiers » des onglets (fichier Périmètres_MAS.csv).",
+        value=f"{nb_quartiers} grands quartiers, {len(table)} IRIS",
     )
-    ws_sources.merge_cells(start_row=ligne + 1, start_column=premiere, end_row=ligne + 2, end_column=premiere + 2)
+    ws_sources.merge_cells(start_row=ligne + 1, start_column=premiere, end_row=ligne + 1, end_column=premiere + 2)
     note.font = Font(name=police, italic=True, size=9, color="595959")
     note.alignment = Alignment(wrap_text=True, vertical="top")
 
     if ws_sources.print_area:
-        bas = max(ws_sources.max_row, ligne + 2)
+        bas = max(ws_sources.max_row, ligne + 1)
         ws_sources.print_area = f"A1:{get_column_letter(premiere + 2)}{bas}"
 
 
