@@ -43,7 +43,7 @@ Le classeur s'ouvre sur l'onglet **Accueil** : une description générale du cla
 
 ![Classeur : onglet Accueil (chiffres clés)](doc/img/excel-portrait.png)
 
-Juste après, l'onglet **Sources** est généré selon le lot : millésime de chaque source et lien vers sa documentation Insee, précisions, la **correspondance grand quartier → IRIS** (Roubaix : code IRIS, libellé et grand quartier, d'après `Périmètres_MAS.csv`), puis le **détail des calculs** (formule de chaque indicateur calculé, en rouge s'il n'a pas pu l'être faute de variable).
+Juste après, l'onglet **Sources** est généré selon le lot : millésime de chaque source et lien vers sa documentation Insee, précisions, puis le **détail des calculs** (formule de chaque indicateur calculé, en rouge s'il n'a pas pu l'être faute de variable). À droite de la page, un tableau donne la **correspondance grand quartier → IRIS** (Roubaix : code IRIS, libellé et grand quartier, d'après `Périmètres_MAS.csv`).
 
 ![Classeur : onglet Sources](doc/img/excel-presentation.png)
 
