@@ -5,11 +5,14 @@
   (ex-onglet « Detail calcul », supprimé), en deuxième ;
 - les onglets thématiques suivent, dans leur ordre habituel.
 
+Pour Roubaix, Sources se termine aussi par la correspondance grand quartier -> IRIS
+(Code IRIS, libellé, grand quartier), placée avant le détail des calculs.
+
 Étape finale du pipeline : les modules précédents travaillent encore sur les noms du modèle Excel.
 """
 from copy import copy
 
-from openpyxl.styles import Alignment, Font
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 NOM_ACCUEIL = "Accueil"
 NOM_SOURCES = "Sources"
@@ -59,11 +62,98 @@ def _hauteur(textes: list[tuple[str, float]], taille: float) -> float:
     return min(409, lignes * taille * 1.35 + 6)
 
 
+def _derniere_ligne_remplie(ws) -> int:
+    derniere = ws.max_row
+    while derniere > 1 and all(c.value in (None, "") for c in ws[derniere]):
+        derniere -= 1
+    return derniere
+
+
+def table_grands_quartiers(dico_fichiers: dict) -> list[tuple[str, str, str]]:
+    """[(code IRIS, libellé, grand quartier), ...] triés par code, depuis les colonnes de Périmètres_MAS.csv
+    déjà jointes aux données (mêmes valeurs que la colonne « Grands quartiers » des onglets)."""
+    lignes = {}
+    for df in dico_fichiers.values():
+        colonnes = getattr(df, "columns", [])
+        if not {"IRIS", "Grands quartiers"} <= set(colonnes):
+            continue
+        libelles = df["Libellé de l'Iris"] if "Libellé de l'Iris" in colonnes else [None] * len(df)
+        for code, libelle, quartier in zip(df["IRIS"], libelles, df["Grands quartiers"]):
+            # IRIS non localisé (59512) ou hors référentiel : pas de grand quartier
+            if not isinstance(quartier, str) or not quartier.strip():
+                continue
+            code = str(code).strip()
+            lignes.setdefault(code, (code, libelle if isinstance(libelle, str) else "", quartier.strip()))
+    return [lignes[code] for code in sorted(lignes)]
+
+
+def _ajouter_grands_quartiers(ws_sources, table) -> None:
+    """Tableau Code IRIS / IRIS / Grand quartier sous le contenu de la page Sources (colonnes A à D)."""
+    style_bandeau = next(
+        (c for c in ws_sources["A"] if isinstance(c.value, str) and c.value.strip().startswith("Précision")),
+        ws_sources["A3"],
+    )
+    police = style_bandeau.font.name or "Arial"
+    entete_fond = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
+    bande = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+    bordure = Border(*(Side(style="thin", color="BFBFBF"),) * 4)
+
+    ligne = _derniere_ligne_remplie(ws_sources) + 2
+    ws_sources.merge_cells(start_row=ligne, start_column=1, end_row=ligne, end_column=5)
+    bandeau = ws_sources.cell(row=ligne, column=1, value="Correspondance grand quartier → IRIS")
+    _copier_style(style_bandeau, bandeau)
+    bandeau.alignment = Alignment(horizontal="center", vertical="center")
+    ws_sources.row_dimensions[ligne].height = 18
+    ligne += 1
+    nb_quartiers = len({quartier for _, _, quartier in table})
+    note = ws_sources.cell(
+        row=ligne, column=1,
+        value=f"{nb_quartiers} grands quartiers, {len(table)} IRIS. Un grand quartier peut regrouper plusieurs IRIS ; "
+              "c'est la colonne « Grands quartiers » des onglets (fichier Périmètres_MAS.csv).",
+    )
+    ws_sources.merge_cells(start_row=ligne, start_column=1, end_row=ligne, end_column=5)
+    note.font = Font(name=police, italic=True, size=9, color="595959")
+    note.alignment = Alignment(wrap_text=True, vertical="center")
+    ws_sources.row_dimensions[ligne].height = 18
+    ligne += 2
+
+    # Code IRIS en A, libellé sur B:C, grand quartier en D
+    plages = ((1, 1), (2, 3), (4, 4))
+    for (debut, fin), texte in zip(plages, ("Code IRIS", "IRIS", "Grand quartier")):
+        if fin > debut:
+            ws_sources.merge_cells(start_row=ligne, start_column=debut, end_row=ligne, end_column=fin)
+        for colonne in range(debut, fin + 1):
+            ws_sources.cell(row=ligne, column=colonne).fill = entete_fond
+            ws_sources.cell(row=ligne, column=colonne).border = bordure
+        cellule = ws_sources.cell(row=ligne, column=debut, value=texte)
+        cellule.font = Font(name=police, bold=True, size=10, color="FFFFFF")
+        cellule.alignment = Alignment(horizontal="left", vertical="center")
+    ws_sources.row_dimensions[ligne].height = 18
+    ligne += 1
+
+    for rang, valeurs in enumerate(table):
+        for (debut, fin), valeur in zip(plages, valeurs):
+            if fin > debut:
+                ws_sources.merge_cells(start_row=ligne, start_column=debut, end_row=ligne, end_column=fin)
+            for colonne in range(debut, fin + 1):
+                ws_sources.cell(row=ligne, column=colonne).border = bordure
+                if rang % 2:
+                    ws_sources.cell(row=ligne, column=colonne).fill = bande
+            cellule = ws_sources.cell(row=ligne, column=debut, value=valeur)
+            cellule.font = Font(name=police, size=10, bold=debut == 4)
+            cellule.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            if debut == 1:
+                cellule.number_format = "@"
+        ws_sources.row_dimensions[ligne].height = 15
+        ligne += 1
+
+    if ws_sources.print_area:
+        ws_sources.print_area = f"A1:E{ligne - 1}"
+
+
 def _ajouter_detail_calcul(ws_sources, themes) -> None:
     """Ajoute le détail des calculs sous le contenu de la page Sources (colonnes A à E)."""
-    derniere = ws_sources.max_row
-    while derniere > 1 and all(c.value in (None, "") for c in ws_sources[derniere]):
-        derniere -= 1
+    derniere = _derniere_ligne_remplie(ws_sources)
     # Styles repris de la page : bandeau « Précision » et sous-titres « # ... »
     style_bandeau = next(
         (c for c in ws_sources["A"] if isinstance(c.value, str) and c.value.strip().startswith("Précision")),
@@ -123,8 +213,11 @@ def _ajouter_detail_calcul(ws_sources, themes) -> None:
         ws_sources.print_area = f"A1:E{ligne - 1}"
 
 
-def organiser_onglets_accueil_sources(workbook) -> None:
-    """Accueil (chiffres clés) puis Sources (présentation + détail des calculs) en tête du classeur."""
+def organiser_onglets_accueil_sources(workbook, grands_quartiers=None) -> None:
+    """Accueil (chiffres clés) puis Sources (présentation + détail des calculs) en tête du classeur.
+
+    grands_quartiers : lignes de table_grands_quartiers (Roubaix), ajoutées à Sources avant le détail des calculs.
+    """
     portrait = next((ws for ws in workbook.worksheets if ws.title.startswith("Portrait ")), None)
     if portrait is not None:
         portrait.title = NOM_ACCUEIL
@@ -132,6 +225,8 @@ def organiser_onglets_accueil_sources(workbook) -> None:
     if ANCIEN_PRESENTATION in workbook.sheetnames:
         ws_sources = workbook[ANCIEN_PRESENTATION]
         ws_sources.title = NOM_SOURCES
+        if grands_quartiers:
+            _ajouter_grands_quartiers(ws_sources, grands_quartiers)
         if ANCIEN_DETAIL in workbook.sheetnames:
             _ajouter_detail_calcul(ws_sources, _lire_detail_calcul(workbook[ANCIEN_DETAIL]))
     if ANCIEN_DETAIL in workbook.sheetnames:

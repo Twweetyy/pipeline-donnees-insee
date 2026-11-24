@@ -43,7 +43,7 @@ Le classeur s'ouvre sur l'onglet **Accueil** : une description générale du cla
 
 ![Classeur : onglet Accueil (chiffres clés)](doc/img/excel-portrait.png)
 
-Juste après, l'onglet **Sources** est généré selon le lot : millésime de chaque source et lien vers sa documentation Insee, précisions, puis le **détail des calculs** (formule de chaque indicateur calculé, en rouge s'il n'a pas pu l'être faute de variable).
+Juste après, l'onglet **Sources** est généré selon le lot : millésime de chaque source et lien vers sa documentation Insee, précisions, la **correspondance grand quartier → IRIS** (Roubaix : code IRIS, libellé et grand quartier, d'après `Périmètres_MAS.csv`), puis le **détail des calculs** (formule de chaque indicateur calculé, en rouge s'il n'a pas pu l'être faute de variable).
 
 ![Classeur : onglet Sources](doc/img/excel-presentation.png)
 
@@ -146,7 +146,7 @@ pipeline-donnees-insee/
 │  ├─ mise_en_page.py              Formats, largeurs, hauteurs, centrage, ligne Total, ordre des colonnes
 │  ├─ pages_info.py                Pages Présentation et Détail calcul générées selon le lot (fusionnées ensuite dans Sources)
 │  ├─ portrait_roubaix.py          Chiffres clés de Roubaix ou de la MEL en formules Excel, avec la description du classeur
-│  ├─ onglets_accueil_sources.py   Onglets Accueil (chiffres clés) et Sources (présentation + détail des calculs) en tête
+│  ├─ onglets_accueil_sources.py   Onglets Accueil (chiffres clés) et Sources (présentation, grands quartiers → IRIS, détail des calculs) en tête
 │  ├─ perimetre_mel.py             Périmètre MEL : somme des IRIS par commune, textes du classeur
 │  ├─ colonnes_auto.py             Colonnes inconnues d'un nouveau millésime (sans IA puis IA, cache YAML)
 │  ├─ llm_wrapper.py               Appel d'un modèle compatible OpenAI (Groq, Mistral, Ollama…)
